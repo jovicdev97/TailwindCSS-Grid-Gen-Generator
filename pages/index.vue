@@ -17,12 +17,10 @@ import GridCanvas from '~/components/GridCanvas.vue'
 import CodeOutput from '~/components/CodeOutput.vue'
 import GridPreview from '~/components/GridPreview.vue'
 
-const { toast, showToast } = inject('toast')
 const gridStore = useGridStore()
 
 const undo = () => {
   gridStore.undo()
-  showToast('Action undone', 'info')
 }
 
 const handleKeyDown = (event) => {
