@@ -13,6 +13,16 @@
         </label>
       </div>
       <div class="flex items-center space-x-4">
+        <button @click="zoomIn" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+          </svg>
+        </button>
+        <button @click="zoomOut" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM5 10h14" />
+          </svg>
+        </button>
         <button @click="clearGrid" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
           Grid leeren
         </button>
@@ -23,34 +33,31 @@
     </div>
 
     <!-- Grid Area -->
-    <div 
-      class="grid-container relative mt-4 border border-gray-300"
-      ref="gridContainer"
-      @mousedown="startDrawing" 
-      @mousemove="drawBox" 
-      @mouseup="finishDrawing"
-      @mouseleave="finishDrawing"
-      :style="gridContainerStyle"
-    >
-      <!-- Grid Lines -->
-      <div v-for="col in columns" :key="'col-' + col"
-           :style="{ left: `${(col - 1) * 100 / columns}%` }"
-           class="grid-line vertical"></div>
-      <div v-for="row in rows" :key="'row-' + row"
-           :style="{ top: `${(row - 1) * 100 / rows}%` }"
-           class="grid-line horizontal"></div>
+    <div class="relative mt-4 border border-gray-300 overflow-auto" :style="containerStyle">
+      <div 
+        class="grid-container relative"
+        ref="gridContainer"
+        @mousedown="startDrawing" 
+        @mousemove="drawBox" 
+        @mouseup="finishDrawing"
+        @mouseleave="finishDrawing"
+        :style="gridContainerStyle"
+      >
+        <!-- Background Grid Lines -->
+        <div class="absolute inset-0" :style="backgroundGridStyle"></div>
 
-      <!-- Grid Boxes -->
-      <GridBox 
-        v-for="box in gridStore.boxes" 
-        :key="box.id" 
-        :box="box" 
-        :gridSize="{ columns, rows }"
-        @remove="removeBox(box.id)"
-      />
+        <!-- Grid Boxes -->
+        <GridBox 
+          v-for="box in gridStore.boxes" 
+          :key="box.id" 
+          :box="box" 
+          :gridSize="{ columns, rows }"
+          @remove="removeBox(box.id)"
+        />
 
-      <!-- Preview Box -->
-      <div v-if="previewBox" :style="previewBoxStyle" class="preview-box"></div>
+        <!-- Preview Box -->
+        <div v-if="previewBox" :style="previewBoxStyle" class="preview-box"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -64,6 +71,7 @@ const gridStore = useGridStore()
 
 const columns = ref(12)
 const rows = ref(6)
+const zoom = ref(1)
 
 const gridContainer = ref(null)
 
@@ -72,10 +80,22 @@ const startX = ref(0)
 const startY = ref(0)
 const previewBox = ref(null)
 
-const gridContainerStyle = computed(() => ({
+const containerStyle = computed(() => ({
   width: '100%',
-  paddingTop: `${(rows.value / columns.value) * 100}%`,
-  backgroundColor: '#f9f9f9'
+  height: '70vh',
+}))
+
+const gridContainerStyle = computed(() => ({
+  width: `${100 * zoom.value}%`,
+  paddingTop: `${(rows.value / columns.value) * 100 * zoom.value}%`,
+  backgroundColor: '#f9f9f9',
+  backgroundSize: `${100 / columns.value}% ${100 / rows.value}%`,
+}))
+
+const backgroundGridStyle = computed(() => ({
+  backgroundImage: `linear-gradient(to right, #e0e0e0 1px, transparent 1px),
+                    linear-gradient(to bottom, #e0e0e0 1px, transparent 1px)`,
+  backgroundSize: `${100 / columns.value}% ${100 / rows.value}%`,
 }))
 
 const previewBoxStyle = computed(() => {
@@ -142,6 +162,14 @@ function updateGridSize() {
   gridStore.setGridSize({ columns: columns.value, rows: rows.value })
 }
 
+function zoomIn() {
+  zoom.value = Math.min(zoom.value + 0.1, 2)
+}
+
+function zoomOut() {
+  zoom.value = Math.max(zoom.value - 0.1, 0.5)
+}
+
 onMounted(() => {
   window.addEventListener('mouseup', finishDrawing)
   updateGridSize()
@@ -159,21 +187,6 @@ watch([columns, rows], updateGridSize)
   position: relative;
   width: 100%;
   overflow: hidden;
-}
-
-.grid-line {
-  position: absolute;
-  background-color: #e0e0e0;
-}
-
-.grid-line.vertical {
-  width: 1px;
-  height: 100%;
-}
-
-.grid-line.horizontal {
-  height: 1px;
-  width: 100%;
 }
 
 .preview-box {
