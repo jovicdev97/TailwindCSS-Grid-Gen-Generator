@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center w-full">
+  <div class="flex flex-col h-screen">
     <!-- Grid Controls -->
     <div class="flex items-center justify-between w-full p-4 bg-gray-100 shadow-md">
       <div class="flex items-center space-x-4">
@@ -13,6 +13,7 @@
         </label>
       </div>
       <div class="flex items-center space-x-4">
+        <button @click="undo" class="bg-blue-500 text-white px-4 py-2 rounded">Rückgängig (STRG+Z)</button>
         <button @click="zoomIn" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -33,30 +34,32 @@
     </div>
 
     <!-- Grid Area -->
-    <div class="relative mt-4 border border-gray-300 overflow-auto" :style="containerStyle">
-      <div 
-        class="grid-container relative"
-        ref="gridContainer"
-        @mousedown="startDrawing" 
-        @mousemove="drawBox" 
-        @mouseup="finishDrawing"
-        @mouseleave="finishDrawing"
-        :style="gridContainerStyle"
-      >
-        <!-- Background Grid Lines -->
-        <div class="absolute inset-0" :style="backgroundGridStyle"></div>
+    <div class="flex-grow overflow-hidden">
+      <div class="w-full h-full relative border border-gray-300" :style="containerStyle">
+        <div 
+          class="grid-container absolute inset-0"
+          ref="gridContainer"
+          @mousedown="startDrawing" 
+          @mousemove="drawBox" 
+          @mouseup="finishDrawing"
+          @mouseleave="finishDrawing"
+          :style="gridContainerStyle"
+        >
+          <!-- Background Grid Lines -->
+          <div class="absolute inset-0" :style="backgroundGridStyle"></div>
 
-        <!-- Grid Boxes -->
-        <GridBox 
-          v-for="box in gridStore.boxes" 
-          :key="box.id" 
-          :box="box" 
-          :gridSize="{ columns, rows }"
-          @remove="removeBox(box.id)"
-        />
+          <!-- Grid Boxes -->
+          <GridBox 
+            v-for="box in gridStore.boxes" 
+            :key="box.id" 
+            :box="box" 
+            :gridSize="{ columns, rows }"
+            @remove="removeBox(box.id)"
+          />
 
-        <!-- Preview Box -->
-        <div v-if="previewBox" :style="previewBoxStyle" class="preview-box"></div>
+          <!-- Preview Box -->
+          <div v-if="previewBox" :style="previewBoxStyle" class="preview-box"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -81,15 +84,15 @@ const startY = ref(0)
 const previewBox = ref(null)
 
 const containerStyle = computed(() => ({
-  width: '100%',
-  height: '70vh',
+  overflow: 'hidden',
 }))
 
 const gridContainerStyle = computed(() => ({
   width: `${100 * zoom.value}%`,
-  paddingTop: `${(rows.value / columns.value) * 100 * zoom.value}%`,
+  height: `${100 * zoom.value}%`,
+  transform: `scale(${1 / zoom.value})`,
+  transformOrigin: 'top left',
   backgroundColor: '#f9f9f9',
-  backgroundSize: `${100 / columns.value}% ${100 / rows.value}%`,
 }))
 
 const backgroundGridStyle = computed(() => ({
@@ -185,8 +188,6 @@ watch([columns, rows], updateGridSize)
 <style scoped>
 .grid-container {
   position: relative;
-  width: 100%;
-  overflow: hidden;
 }
 
 .preview-box {
