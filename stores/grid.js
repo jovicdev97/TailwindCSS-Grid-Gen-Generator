@@ -5,33 +5,22 @@ export const useGridStore = defineStore('grid', {
     boxes: [],
     history: [],
     gridSize: { columns: 12, rows: 6 },
-    cellSize: { width: 80, height: 60 },
-    viewportSize: { width: 1920, height: 1080 }
   }),
   actions: {
     addBox(box) {
       this.saveState()
       this.boxes.push(box)
     },
-    removeBox(index) {
+    removeBox(id) {
       this.saveState()
-      this.boxes.splice(index, 1)
+      this.boxes = this.boxes.filter(box => box.id !== id)
     },
     clear() {
       this.saveState()
       this.boxes = []
     },
     setGridSize(size) {
-      this.saveState()
       this.gridSize = size
-    },
-    setCellSize(size) {
-      this.saveState()
-      this.cellSize = size
-    },
-    setViewportSize(size) {
-      this.saveState()
-      this.viewportSize = size
     },
     saveState() {
       this.history.push(JSON.stringify(this.boxes))
@@ -43,22 +32,19 @@ export const useGridStore = defineStore('grid', {
       }
     },
     export() {
-      const classes = `grid grid-cols-${this.gridSize.columns} grid-rows-${this.gridSize.rows} gap-4 border-2`
+      const gridClasses = `grid grid-cols-${this.gridSize.columns} grid-rows-${this.gridSize.rows} gap-4 border-2`
       return `
-        <div class="${classes}">
-          ${this.boxes.map((box, index) => `
-            <div class="${this.generateTailwindClasses(box)}">
-              Box ${index + 1}
-            </div>
-          `).join('')}
-        </div>
-      `
+<div class="${gridClasses} w-full h-full">
+  ${this.boxes.map(box => `  <div class="${this.generateTailwindClasses(box)}">
+    <!-- Inhalt hier -->
+  </div>`).join('\n')}
+</div>`.trim()
     },
     generateTailwindClasses(box) {
-      const colSpan = Math.ceil(box.width / this.cellSize.width)
-      const rowSpan = Math.ceil(box.height / this.cellSize.height)
-      const colStart = Math.floor(box.startX / this.cellSize.width) + 1
-      const rowStart = Math.floor(box.startY / this.cellSize.height) + 1
+      const colSpan = Math.round(box.width * this.gridSize.columns)
+      const rowSpan = Math.round(box.height * this.gridSize.rows)
+      const colStart = Math.round(box.startX * this.gridSize.columns) + 1
+      const rowStart = Math.round(box.startY * this.gridSize.rows) + 1
 
       return `col-span-${colSpan} row-span-${rowSpan} col-start-${colStart} row-start-${rowStart} border-2`
     }
