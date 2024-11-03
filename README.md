@@ -1,4 +1,13 @@
-# Nuxt 3 Minimal Starter
+<img src="http://i.epvpimg.com/augWdab.png" />
+
+<p align="center">
+  <img src="http://i.epvpimg.com/IrIPdab.png" alt="Bild1" width="30%" />
+  <img src="http://i.epvpimg.com/0R4qbab.png" alt="Bild2" width="30%" />
+  <img src="http://i.epvpimg.com/augWdab.png" alt="Bild3" width="30%" />
+</p>
+
+
+# Nuxt 3 
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
