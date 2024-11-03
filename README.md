@@ -1,3 +1,9 @@
+simple project I made for a project of mine
+
+- able to easily generate grids in tailwindcss
+- row/column config
+- written in vue nuxtjs javascript/ts pinia-store and ofc themed with tailwindCSS :D 
+
 <img src="http://i.epvpimg.com/augWdab.png" />
 
 <p align="center">
