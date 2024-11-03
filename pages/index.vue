@@ -2,7 +2,6 @@
   <div class="container mx-auto">
     <GridCanvas />
     <CodeOutput />
-    <h1 class="text-3xl font-bold mb-6">Tailwind Grid Generator</h1>
   </div>
 </template>
 
