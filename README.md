@@ -1,10 +1,12 @@
-simple project I made for a project of mine
+this simple project provides an easy way to generate responsive grids using TailwindCSS. Built with Vue, Nuxt.js, and JavaScript/TypeScript, and managed with Pinia store, this setup lets you create flexible, customizable grids for any layout.
 
-- able to easily generate grids in tailwindcss
-- row/column config
-- written in vue nuxtjs javascript/ts pinia-store and ofc themed with tailwindCSS :D 
+- set up responsive grids with TailwindCSS for your webrpoject
+- Row & Column Configuration: Customize your grid's row and column layout to suit your needs.
 
-<img src="http://i.epvpimg.com/augWdab.png" />
+<p align="center">
+<img src="http://i.epvpimg.com/0R4qbab.png" width="50%"/>
+<img src="http://i.epvpimg.com/PWrcdab.png" width="50%"/>
+</p>
 
 <p align="center">
   <img src="http://i.epvpimg.com/IrIPdab.png" alt="Bild1" width="30%" />
